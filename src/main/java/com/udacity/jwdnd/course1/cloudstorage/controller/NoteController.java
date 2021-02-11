@@ -1,0 +1,49 @@
+package com.udacity.jwdnd.course1.cloudstorage.controller;
+
+import com.udacity.jwdnd.course1.cloudstorage.model.User;
+import com.udacity.jwdnd.course1.cloudstorage.service.NoteService;
+import com.udacity.jwdnd.course1.cloudstorage.service.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/note")
+public class NoteController {
+    private NoteService noteService;
+    private UserService userService;
+
+    public NoteController(NoteService noteService, UserService userService) {
+        this.noteService = noteService;
+        this.userService = userService;
+    }
+
+    @PostMapping("/save")
+    public String handleNoteSave(@RequestParam(value = "noteId", required = false) Integer noteId,
+                                 @RequestParam("noteTitle") String noteTitle,
+                                 @RequestParam("noteDescription") String noteDescription,
+                                 RedirectAttributes redirectAttributes,
+                                 Authentication authentication) {
+
+        User currentUser = userService.getUser(authentication.getName());
+        noteService.saveNote(noteId, noteTitle, noteDescription, currentUser.getUserid());
+
+        redirectAttributes.addFlashAttribute("activeTab", "notes");
+        return "redirect:/home";
+    }
+
+    @GetMapping("/delete/{noteid}")
+    public String handleNoteDelete(@PathVariable Integer noteid, Model model, Authentication authentication) {
+        User currentUser = userService.getUser(authentication.getName());
+        noteService.deleteNote(noteid, currentUser.getUserid());
+
+        model.addAttribute("activeTab", "notes");
+        return "home";
+    }
+}
