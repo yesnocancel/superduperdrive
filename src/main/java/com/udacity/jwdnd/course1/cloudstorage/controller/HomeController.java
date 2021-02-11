@@ -1,6 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
+import com.udacity.jwdnd.course1.cloudstorage.model.CredentialAndDecrypted;
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
 import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
@@ -37,7 +38,8 @@ public class HomeController {
 
         List<File> fileList = fileService.getFileListForUser(currentUser.getUserid());
         List<Note> noteList = noteService.getNoteListForUser(currentUser.getUserid());
-        List<Credential> credentialList = credentialService.getCredentialListForUser(currentUser.getUserid());
+        List<Credential> encryptedCredentialList = credentialService.getCredentialListForUser(currentUser.getUserid());
+        List<CredentialAndDecrypted> credentialList = credentialService.getDecryptedPasswords(encryptedCredentialList);
 
         model.addAttribute("fileList", fileList);
         model.addAttribute("noteList", noteList);

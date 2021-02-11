@@ -1,5 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import com.udacity.jwdnd.course1.cloudstorage.service.NoteService;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.util.List;
 import org.junit.jupiter.api.*;
@@ -7,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
@@ -23,14 +25,12 @@ class CloudStorageApplicationTests {
 	private static final String PASSWORD = "$eleniumpa$$word";
 	private static final String FIRSTNAME = "Selenium";
 	private static final String LASTNAME = "Test";
-	private static final String NOTE_TITLE = "Test Note Title";
+	private static final String NOTE_TITLE = "TestNote";
 	private static final String NOTE_DESCRIPTION = "Test Note Description";
 	private static final String CREDENTIAL_URL = "http://testurl";
 	private static final String CREDENTIAL_USERNAME = "TestUser";
 	private static final String CREDENTIAL_PASSWORD = "TestPassword";
-	private static final String CREDENTIAL_KEY = "OPkyjIDDpUgnzwrWdErCpw==";
 
-	
 	@BeforeAll
 	static void beforeAll() {
 		WebDriverManager.chromedriver().setup();
@@ -91,25 +91,64 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	public void createAndReadAndDeleteNewNote() {
+	public void createAndReadNewNote() {
 		signup(driver);
 		login(driver);
+		driver.get(baseUrl + "/home");
 		HomePage homePage = new HomePage(driver);
 
 		// Create
-		driver.get(baseUrl + "/home");
 		homePage.createNewNote(NOTE_TITLE, NOTE_DESCRIPTION);
 
 		// Read
-		driver.get(baseUrl + "/home");
 		List<String> noteTitles = homePage.getNoteTitles();
 		List<String> noteDescriptions = homePage.getNoteDescriptions();
 		Assertions.assertEquals(NOTE_TITLE, noteTitles.get(0));
 		Assertions.assertEquals(NOTE_DESCRIPTION, noteDescriptions.get(0));
 
+		// Cleanup
+		homePage.deleteNote(0);
+	}
+
+	@Test
+	public void createAndEditAndReadNewNote() {
+		signup(driver);
+		login(driver);
+		driver.get(baseUrl + "/home");
+		HomePage homePage = new HomePage(driver);
+
+		// Create
+		homePage.createNewNote(NOTE_TITLE, NOTE_DESCRIPTION);
+
+		// Edit
+		homePage.editNote(0, NOTE_TITLE + "EDIT", NOTE_DESCRIPTION + "EDIT");
+
+		// Read
+		List<String> noteTitles = homePage.getNoteTitles();
+		List<String> noteDescriptions = homePage.getNoteDescriptions();
+		Assertions.assertEquals(NOTE_TITLE + "EDIT", noteTitles.get(0));
+		Assertions.assertEquals(NOTE_DESCRIPTION + "EDIT", noteDescriptions.get(0));
+
+		// Cleanup
+		homePage.deleteNote(0);
+	}
+
+	@Test
+	public void createAndDeleteNewNote() {
+		signup(driver);
+		login(driver);
+		driver.get(baseUrl + "/home");
+		HomePage homePage = new HomePage(driver);
+
+		// Create
+		homePage.createNewNote(NOTE_TITLE, NOTE_DESCRIPTION);
+		List<String> noteTitles = homePage.getNoteTitles();
+		List<String> noteDescriptions = homePage.getNoteDescriptions();
+		Assertions.assertEquals(1, noteTitles.size());
+		Assertions.assertEquals(1, noteDescriptions.size());
+
 		// Delete
 		homePage.deleteNote(0);
-		driver.get(baseUrl + "/home");
 		noteTitles = homePage.getNoteTitles();
 		noteDescriptions = homePage.getNoteDescriptions();
 		Assertions.assertEquals(0, noteTitles.size());
@@ -117,33 +156,74 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	public void createAndReadAndDeleteNewCredential() {
+	public void createAndReadNewCredential() {
 		signup(driver);
 		login(driver);
 		HomePage homePage = new HomePage(driver);
 
 		// Create
-		driver.get(baseUrl + "/home");
 		homePage.createNewCredential(CREDENTIAL_URL, CREDENTIAL_USERNAME, CREDENTIAL_PASSWORD);
 
 		// Read
-		driver.get(baseUrl + "/home");
 		List<String> credentialUrls = homePage.getCredentialUrls();
 		List<String> credentialUsernames = homePage.getCredentialUsernames();
-		List<String> credentialKeys = homePage.getCredentialKeys();
+		List<String> credentialPasswords = homePage.getCredentialPasswords();
 		Assertions.assertEquals(CREDENTIAL_URL, credentialUrls.get(0));
 		Assertions.assertEquals(CREDENTIAL_USERNAME, credentialUsernames.get(0));
-		Assertions.assertEquals(CREDENTIAL_KEY, credentialKeys.get(0));
+		Assertions.assertNotEquals(CREDENTIAL_PASSWORD, credentialPasswords.get(0)); // must not show unencrypted password
+
+		// Cleanup
+		homePage.deleteCredential(0);
+	}
+
+	@Test
+	public void createAndEditAndReadNewCredential() {
+		signup(driver);
+		login(driver);
+		HomePage homePage = new HomePage(driver);
+
+		// Create
+		homePage.createNewCredential(CREDENTIAL_URL, CREDENTIAL_USERNAME, CREDENTIAL_PASSWORD);
+
+		// Edit
+		homePage.editCredential(0, CREDENTIAL_URL + "EDIT", CREDENTIAL_USERNAME + "EDIT", CREDENTIAL_PASSWORD + "EDIT");
+
+		// Read
+		List<String> credentialUrls = homePage.getCredentialUrls();
+		List<String> credentialUsernames = homePage.getCredentialUsernames();
+		List<String> credentialPasswords = homePage.getCredentialPasswords();
+		Assertions.assertEquals(CREDENTIAL_URL + "EDIT", credentialUrls.get(0));
+		Assertions.assertEquals(CREDENTIAL_USERNAME + "EDIT", credentialUsernames.get(0));
+		Assertions.assertNotEquals(CREDENTIAL_PASSWORD + "EDIT", credentialPasswords.get(0)); // must not show unencrypted password
+
+		// Cleanup
+		homePage.deleteCredential(0);
+	}
+
+	@Test
+	public void createAndDeleteNewCredential() {
+		signup(driver);
+		login(driver);
+		HomePage homePage = new HomePage(driver);
+		driver.get(baseUrl + "/home");
+
+		// Create
+		homePage.createNewCredential(CREDENTIAL_URL, CREDENTIAL_USERNAME, CREDENTIAL_PASSWORD);
+		List<String> credentialUrls = homePage.getCredentialUrls();
+		List<String> credentialUsernames = homePage.getCredentialUsernames();
+		List<String> credentialPasswords = homePage.getCredentialPasswords();
+		Assertions.assertEquals(1, credentialUrls.size());
+		Assertions.assertEquals(1, credentialUsernames.size());
+		Assertions.assertEquals(1, credentialPasswords.size());
 
 		// Delete
 		homePage.deleteCredential(0);
-		driver.get(baseUrl + "/home");
 		credentialUrls = homePage.getCredentialUrls();
 		credentialUsernames = homePage.getCredentialUsernames();
-		credentialKeys = homePage.getCredentialKeys();
+		credentialPasswords = homePage.getCredentialPasswords();
 		Assertions.assertEquals(0, credentialUrls.size());
 		Assertions.assertEquals(0, credentialUsernames.size());
-		Assertions.assertEquals(0, credentialKeys.size());
+		Assertions.assertEquals(0, credentialPasswords.size());
 	}
 
 	private void signup(WebDriver driver) {
