@@ -5,7 +5,6 @@ import com.udacity.jwdnd.course1.cloudstorage.service.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,15 +34,17 @@ public class NoteController {
         noteService.saveNote(noteId, noteTitle, noteDescription, currentUser.getUserid());
 
         redirectAttributes.addFlashAttribute("activeTab", "notes");
+        redirectAttributes.addFlashAttribute("changeSuccess", true);
         return "redirect:/home";
     }
 
     @GetMapping("/delete/{noteid}")
-    public String handleNoteDelete(@PathVariable Integer noteid, Model model, Authentication authentication) {
+    public String handleNoteDelete(@PathVariable Integer noteid, RedirectAttributes redirectAttributes, Authentication authentication) {
         User currentUser = userService.getUser(authentication.getName());
         noteService.deleteNote(noteid, currentUser.getUserid());
 
-        model.addAttribute("activeTab", "notes");
-        return "home";
+        redirectAttributes.addFlashAttribute("activeTab", "notes");
+        redirectAttributes.addFlashAttribute("deleteSuccess", true);
+        return "redirect:/home";
     }
 }

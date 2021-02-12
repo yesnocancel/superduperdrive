@@ -30,10 +30,18 @@ public class FileService {
         }
     }
 
-    public void uploadMultipartFile(MultipartFile multipartFile, Integer userId) throws IOException {
+    public boolean uploadMultipartFile(MultipartFile multipartFile, Integer userId) throws IOException {
         File file = new File(null, multipartFile.getOriginalFilename(), multipartFile.getContentType(), multipartFile.getSize(), userId,
                              multipartFile.getBytes());
+
+        File existingFile = fileMapper.getFileByFilenameForUser(multipartFile.getOriginalFilename(), userId);
+        if (existingFile != null) {
+            // file with that name already exists - no insert!
+            return false;
+        }
+
         fileMapper.insert(file);
+        return true;
     }
 
     public void deleteFile(Integer fileId, Integer userId) {

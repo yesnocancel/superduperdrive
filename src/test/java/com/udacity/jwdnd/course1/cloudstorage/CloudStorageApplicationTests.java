@@ -142,17 +142,23 @@ class CloudStorageApplicationTests {
 
 		// Create
 		homePage.createNewNote(NOTE_TITLE, NOTE_DESCRIPTION);
+		homePage.createNewNote(NOTE_TITLE + "2", NOTE_DESCRIPTION + "2");
 		List<String> noteTitles = homePage.getNoteTitles();
 		List<String> noteDescriptions = homePage.getNoteDescriptions();
-		Assertions.assertEquals(1, noteTitles.size());
-		Assertions.assertEquals(1, noteDescriptions.size());
+		Assertions.assertEquals(2, noteTitles.size());
+		Assertions.assertEquals(2, noteDescriptions.size());
 
 		// Delete
-		homePage.deleteNote(0);
+		homePage.deleteNote(1);
 		noteTitles = homePage.getNoteTitles();
 		noteDescriptions = homePage.getNoteDescriptions();
-		Assertions.assertEquals(0, noteTitles.size());
-		Assertions.assertEquals(0, noteDescriptions.size());
+		Assertions.assertEquals(1, noteTitles.size());
+		Assertions.assertEquals(1, noteDescriptions.size());
+		Assertions.assertEquals(NOTE_TITLE, noteTitles.get(0));
+		Assertions.assertEquals(NOTE_DESCRIPTION, noteDescriptions.get(0));
+
+		// Cleanup
+		homePage.deleteNote(0);
 	}
 
 	@Test
@@ -209,21 +215,25 @@ class CloudStorageApplicationTests {
 
 		// Create
 		homePage.createNewCredential(CREDENTIAL_URL, CREDENTIAL_USERNAME, CREDENTIAL_PASSWORD);
+		homePage.createNewCredential(CREDENTIAL_URL+"2", CREDENTIAL_USERNAME+"2", CREDENTIAL_PASSWORD+"2");
 		List<String> credentialUrls = homePage.getCredentialUrls();
 		List<String> credentialUsernames = homePage.getCredentialUsernames();
 		List<String> credentialPasswords = homePage.getCredentialPasswords();
+		Assertions.assertEquals(2, credentialUrls.size());
+		Assertions.assertEquals(2, credentialUsernames.size());
+		Assertions.assertEquals(2, credentialPasswords.size());
+
+		// Delete
+		homePage.deleteCredential(1);
+		credentialUrls = homePage.getCredentialUrls();
+		credentialUsernames = homePage.getCredentialUsernames();
+		credentialPasswords = homePage.getCredentialPasswords();
 		Assertions.assertEquals(1, credentialUrls.size());
 		Assertions.assertEquals(1, credentialUsernames.size());
 		Assertions.assertEquals(1, credentialPasswords.size());
 
-		// Delete
+		// Cleanup
 		homePage.deleteCredential(0);
-		credentialUrls = homePage.getCredentialUrls();
-		credentialUsernames = homePage.getCredentialUsernames();
-		credentialPasswords = homePage.getCredentialPasswords();
-		Assertions.assertEquals(0, credentialUrls.size());
-		Assertions.assertEquals(0, credentialUsernames.size());
-		Assertions.assertEquals(0, credentialPasswords.size());
 	}
 
 	private void signup(WebDriver driver) {

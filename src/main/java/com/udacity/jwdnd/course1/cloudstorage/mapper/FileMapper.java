@@ -10,8 +10,8 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface FileMapper {
-    @Select("SELECT * FROM FILES WHERE filename = #{filename}")
-    File getFileByFilename(String filename);
+    @Select("SELECT * FROM FILES WHERE filename = #{filename} AND userid = #{userid}")
+    File getFileByFilenameForUser(String filename, Integer userid);
 
     @Select("SELECT * FROM FILES WHERE fileid = #{fileid}")
     File getFileByFileid(Integer fileid);

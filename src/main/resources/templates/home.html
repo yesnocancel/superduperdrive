@@ -15,6 +15,22 @@
                     <button type="submit" class="btn btn-secondary float-right">Logout</button>
                 </form>
             </div>
+
+            <div class="container justify-content-center w-50 p-3" style="margin-top: 5em;">
+                <div th:if="${changeSuccess}" class="alert alert-success fill-parent">
+                    <h1 class="display-5">Success</h1>
+                    <span>Your changes were successfully saved.</span>
+                </div>
+                <div th:if="${deleteSuccess}" class="alert alert-success fill-parent">
+                    <h1 class="display-5">Success</h1>
+                    <span>Your entry was successfully deleted.</span>
+                </div>
+                <div th:if="${changeError}" class="alert alert-danger fill-parent">
+                    <h1 class="display-5">Error</h1>
+                    <span>Your changes were not saved.</span>
+                </div>
+            </div>
+
             <div id="contentDiv" style="clear: right;">
                 <nav style="clear: right;">
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">

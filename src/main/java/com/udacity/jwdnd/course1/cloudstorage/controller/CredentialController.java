@@ -2,11 +2,9 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.service.CredentialService;
-import com.udacity.jwdnd.course1.cloudstorage.service.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,15 +35,17 @@ public class CredentialController {
         credentialService.saveCredential(credentialId, url, username, password, currentUser.getUserid());
 
         redirectAttributes.addFlashAttribute("activeTab", "credentials");
+        redirectAttributes.addFlashAttribute("changeSuccess", true);
         return "redirect:/home";
     }
 
     @GetMapping("/delete/{credentialid}")
-    public String handleNoteDelete(@PathVariable Integer credentialid, Model model, Authentication authentication) {
+    public String handleNoteDelete(@PathVariable Integer credentialid, RedirectAttributes redirectAttributes, Authentication authentication) {
         User currentUser = userService.getUser(authentication.getName());
         credentialService.deleteCredential(credentialid, currentUser.getUserid());
 
-        model.addAttribute("activeTab", "credentials");
-        return "home";
+        redirectAttributes.addFlashAttribute("activeTab", "credentials");
+        redirectAttributes.addFlashAttribute("deleteSuccess", true);
+        return "redirect:/home";
     }
 }
