@@ -25,6 +25,10 @@
                     <h1 class="display-5">Success</h1>
                     <span>Your entry was successfully deleted.</span>
                 </div>
+                <div th:if="${fileTooLargeError}" class="alert alert-danger fill-parent">
+                    <h1 class="display-5">Error</h1>
+                    <span th:text="'Your file exceeds the allowed maximum size of ' + ${@environment.getProperty('files.max-file-size')}">.</span>
+                </div>
                 <div th:if="${changeError}" class="alert alert-danger fill-parent">
                     <h1 class="display-5">Error</h1>
                     <span>Your changes were not saved.</span>
